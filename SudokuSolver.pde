@@ -3,114 +3,152 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+import java.awt.event.KeyEvent;
 
 boolean isDebugMode = false;
 
+TheGrid theGrid;
+
+Map<String, Boolean> modifierKeys;
+final int VK_COMMAND = 157;
+
 void setup() {
   size(750, 750);
+  colorMode(HSB, Colors.HUE_MAX, Colors.SAT_MAX, Colors.BRIGHT_MAX);
+  ellipseMode(CENTER);
 
-  for (int i = 0; i < theGrid.length; i++) {
-    print("Data as rows: ");
-    for (int j = 0; j < theGrid[i].length; j++) {
-      if (theGrid[i][j].theValue == 0) {
-        removeRowValuesFromPossibleValues(i, j);
-        removeColumnValuesFromPossibleValues(i, j);
-      }
+  theGrid = new TheGrid();
 
-
-      if (rows[0][1].possibleValues.contains(rows[i][j].theValue)) {
-        print(rows[i][j].theValue + ", ");
-      }
-    }
-    println();
-  }
-
-  //for (int i = 0; i < rows[0][0].possibleValues.size(); i++) {
-  //  print("Data as rows: ");
-  //  println();
-  //}
-
-    // create an iterator
-    Iterator<Integer> iterator = rows[0][0].possibleValues.iterator();
-
-    // check values
-    while (iterator.hasNext()) {
-      //if (iterator.next() == 4) {
-      //  rows[0][0].possibleValues.remove();
-      //}
-      println("Value: " + iterator.next() + " ");
-    }
-
-  drawGrid();
-
+  modifierKeys = new HashMap<String, Boolean>(3);
+  modifierKeys.put("Control", false);
+  modifierKeys.put("Alt", false);
+  modifierKeys.put("Command", false);
 }
 
 void draw() {
 
+  theGrid.update();
+  theGrid.display();
 
   if (isDebugMode) {
   }
 }
 
-void removeRowValuesFromPossibleValues(int row, int col) {
-  for (int i = 0; i < theGrid.length; i++) {
-  }
-
-}
-
-void removeColumnValuesFromPossibleValues(int i, int j) {
-}
-
-
-void drawGrid() {
-  float cellWidth = width / 9.0;
-
-  background(255);
-
-  for (int i = 1; i < NUM_CELLS; i++) {
-    if (i % 3 == 0) {
-      strokeWeight(5);
-    } else {
-      strokeWeight(1);
-    }
-
-    line((i * cellWidth), 0, (i * cellWidth), height);
-    line(0, (i * cellWidth), width, (i * cellWidth));
-  }
-
-}
 
 void mousePressed() {
-  activeCell = getCellNumber(mouseX, mouseY);
+  theGrid.setActiveCell(mouseX, mouseY);
 }
-
-
 
 void keyPressed() {
   if (key == CODED) {
-    if (keyCode == UP) {
-    } else if (keyCode == DOWN) {
-    } else if (keyCode == LEFT) {
-    } else if (keyCode == RIGHT) {
+    switch(keyCode) {
+      case KeyEvent.VK_CONTROL:
+        modifierKeys.put("Control", true);
+        // println("CONTROL pressed");
+        break;
+      case KeyEvent.VK_ALT:
+        modifierKeys.put("Alt", true);
+        // println("ALT pressed");
+        break;
+      case VK_COMMAND:
+        modifierKeys.put("Command", true);
+        // println("COMMAND pressed");
+        break;
+      case UP:
+        if (modifierKeys.get("Command")) {
+          // println("CMD+1 was pressed.");
+          theGrid.incCellTextSize();
+        } else {
+          // Change which cell is active
+          theGrid.moveActiveCell(CellDirection.UP);
+        }
+        break;
+      case DOWN:
+        if (modifierKeys.get("Command")) {
+          // println("CMD+1 was pressed.");
+          theGrid.decCellTextSize();
+        } else {
+          // Change which cell is active
+          theGrid.moveActiveCell(CellDirection.DOWN);
+        }
+        break;
+      case LEFT:
+        if (modifierKeys.get("Command")) {
+          // println("CMD+1 was pressed.");
+        } else {
+          // Change which cell is active
+          theGrid.moveActiveCell(CellDirection.LEFT);
+        }
+        break;
+      case RIGHT:
+        if (modifierKeys.get("Command")) {
+          // println("CMD+1 was pressed.");
+        } else {
+          // Change which cell is active
+          theGrid.moveActiveCell(CellDirection.RIGHT);
+        }
+        break;
+
     }
+  } else {
+    switch (key) {
+      case '1':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+1 was pressed.");
+        }
+        break;
+      case '2':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+2 was pressed.");
+        }
+        break;
+      case '3':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+3 was pressed.");
+        }
+        break;
+      case '4':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+4 was pressed.");
+        }
+        break;
+      case 's':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+s was pressed.");
+        } else {
+        }
+        break;
+      case 'd':
+      case 'D':
+        isDebugMode = !isDebugMode;
+        break;
+      case 'b':
+      case 'B':
+        break;
+      case ' ':
+        break;
 
+    }
   }
+}
 
-  if (key == 'd' || key == 'D') {
-    isDebugMode = !isDebugMode;
-  }
-
-  if (key == 'b' || key == 'B') {
-    // toggle background mode
-    isWhiteBackground = !isWhiteBackground;
-  }
-
-  if (key == ' ') {
-    //isLooping = !isLooping;
-    //if (isLooping) {
-    //  noLoop();
-    //} else {
-    //  loop();
-    //}
+void keyReleased() {
+  if (key == CODED) {
+    switch(keyCode) {
+      case KeyEvent.VK_CONTROL:
+        modifierKeys.put("Control", false);
+        // println("CONTROL released");
+        break;
+      case KeyEvent.VK_ALT:
+        modifierKeys.put("Alt", false);
+        // println("ALT released");
+        break;
+      case VK_COMMAND:
+        modifierKeys.put("Command", false);
+        // println("COMMAND released");
+        break;
+    }
   }
 }
