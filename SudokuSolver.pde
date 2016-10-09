@@ -1,4 +1,51 @@
 
+/*
+  pseudo code for solving algorithm
+  1. For every cell, generate it's PossibleValues set
+      During this process, if any cell ends up with only one possible value,
+      make that the cell's value
+
+  2. For every minor grid, scan every cell's PossibleValues set to look for any cells
+      that have the only occurance of a value in that minor grid. (whose PossibleValues
+      set doesn't necessarily have only that value.)
+
+      For example, minor grid 8, cell 1, it's first pass PossibleValues set is:
+        2,3,6,7,9
+
+      though it is the only cell in that minor grid with a possible value of 7
+
+      For example,
+      Minor grid x, y
+        Cell number  Possible values
+        0            *2 (* = value is already assigned to that cell, theValue > 0)
+        1            3,6,8,9
+        2            *5
+        3            3,4
+        4            3,4,9
+        5            1,3,4,9
+        6            4,6
+        7            4,6,8,9
+        8            *7
+
+        Possible values  Cells with that value
+        1                5
+        2                -1 (meaning that the value is already assigned to a cell)
+        3                1,3,4,5
+        4                3,4,5,6,7
+        5                -1
+        6                1,6,7
+        7                -1
+        8                1,7
+        9                1,4,5,7
+
+          Note: -1 = the value has been assigned, so theValue > 0, and there are no
+
+  3. For every minor grid column and row, for every cell with a non-0 value, look for
+      that value in the other minor grids in that column or row.
+
+*/
+
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
@@ -36,7 +83,6 @@ void draw() {
   }
 }
 
-
 void mousePressed() {
   theGrid.setActiveCell(mouseX, mouseY);
 }
@@ -62,7 +108,7 @@ void keyPressed() {
           theGrid.incCellTextSize();
         } else {
           // Change which cell is active
-          theGrid.moveActiveCell(CellDirection.UP);
+          theGrid.setActiveCell(CellDirection.UP);
         }
         break;
       case DOWN:
@@ -71,7 +117,7 @@ void keyPressed() {
           theGrid.decCellTextSize();
         } else {
           // Change which cell is active
-          theGrid.moveActiveCell(CellDirection.DOWN);
+          theGrid.setActiveCell(CellDirection.DOWN);
         }
         break;
       case LEFT:
@@ -79,7 +125,7 @@ void keyPressed() {
           // println("CMD+1 was pressed.");
         } else {
           // Change which cell is active
-          theGrid.moveActiveCell(CellDirection.LEFT);
+          theGrid.setActiveCell(CellDirection.LEFT);
         }
         break;
       case RIGHT:
@@ -87,33 +133,21 @@ void keyPressed() {
           // println("CMD+1 was pressed.");
         } else {
           // Change which cell is active
-          theGrid.moveActiveCell(CellDirection.RIGHT);
+          theGrid.setActiveCell(CellDirection.RIGHT);
         }
         break;
 
     }
   } else {
+    if ((key >= '0') && (key <='9')) {
+      if (modifierKeys.get("Command")) {
+        // println("CMD+1 was pressed.");
+      } else {
+        theGrid.setCellValue(Character.getNumericValue(key));
+      }
+
+    }
     switch (key) {
-      case '1':
-        if (modifierKeys.get("Command")) {
-          // println("CMD+1 was pressed.");
-        }
-        break;
-      case '2':
-        if (modifierKeys.get("Command")) {
-          // println("CMD+2 was pressed.");
-        }
-        break;
-      case '3':
-        if (modifierKeys.get("Command")) {
-          // println("CMD+3 was pressed.");
-        }
-        break;
-      case '4':
-        if (modifierKeys.get("Command")) {
-          // println("CMD+4 was pressed.");
-        }
-        break;
       case 's':
         if (modifierKeys.get("Command")) {
           // println("CMD+s was pressed.");
