@@ -12,12 +12,14 @@ class Cell {
   // private color theColor;
   private Set<Integer> possibleValues;
   private PVector center;
+  private int cellWidth;
   private boolean isActive;
   private int textSize;
 
-  public Cell(int x, int y, int txSz) {
+  public Cell(int x, int y, int w, int txSz) {
     possibleValues = new HashSet<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
     center = new PVector(x, y);
+    cellWidth = w;
     textSize = txSz;
   }
 
@@ -53,10 +55,12 @@ class Cell {
     if (isActive) {
       stroke(Colors.BLACK_GREY_SCL);
       noFill();
-      ellipse(center.x, center.y, width / 9, width / 9);
+      ellipse(center.x, center.y, cellWidth, cellWidth);
       // println("Center = " + center.x + ", " + center.y);
     }
 
+    // Do nothing if the value is 0.
+    // This is used to clear the value from the screen.
     if (theValue > 0) {
       fill(color(theHue, Colors.SAT_MAX, Colors.BRIGHT_MAX));
       // println("displaying cell value " + theValue + " at x, y: " + center.x + ", " + center.y);
@@ -71,13 +75,7 @@ class Cell {
       // rect((center.x - numStringWidth / 2), center.y - (numStringAscent / 2),
       //       numStringWidth, numStringAscent);
       // text(numString, center.x, center.y);
-    } else {
     }
   }
-
-  // public void display(int h)  {
-  //   // TODO - do something with h
-  //   _display();
-  // }
 
 }
