@@ -1,12 +1,17 @@
 
+
 class TheGrid {
 
   private final int NUM_CELLS_MINOR = 3;
   private final int NUM_CELLS_MAJOR = NUM_CELLS_MINOR * NUM_CELLS_MINOR;
 
-  private final int CELL_TEXT_SIZE_MIN = 4;
-  private final int CELL_TEXT_SIZE_MAX = 24;
-  private final int CELL_VALUE_MIN = 1;
+  private final int CELL_TEXT_SIZE_BASE = 24;
+  private final int WIDTH_BASE = 250;
+  private final float WIDTH_SCALE = 0.08;
+
+  private final int CELL_TEXT_SIZE_MIN = 24;
+  private final int CELL_TEXT_SIZE_MAX = 96;
+  private final int CELL_VALUE_MIN = 0;
   private final int CELL_VALUE_MAX = 9;
 
   private Cell[][] theGrid;
@@ -14,9 +19,9 @@ class TheGrid {
   private Cell[][] columns;
   private Cell[][][][] grids;
   private PVector cellSize;
-  private int cellTextSize = 8;  // Default value
-  private PVector activeCell;
-  private boolean enableActiveCell = false;
+  private int cellTextSize;
+  private GridCoords activeCell;
+  private boolean isActiveCellEnabled = false;
 
   public TheGrid() {
 
@@ -29,7 +34,9 @@ class TheGrid {
     int cellSizeHalfX = int(cellSize.x / 2);
     int cellSizeHalfY = int(cellSize.y / 2);
 
-    activeCell = new PVector(0, 0);
+    cellTextSize = int(((width - WIDTH_BASE) * WIDTH_SCALE) + CELL_TEXT_SIZE_BASE);
+
+    activeCell = new GridCoords(0, 0);
 
     // Create the main array
     int x, y;
@@ -42,7 +49,7 @@ class TheGrid {
         // Calculate cell center y
         int centerY = int(height * (float(row) / NUM_CELLS_MAJOR)) + cellSizeHalfY;
 
-        theGrid[col][row] = new Cell(centerX, centerY);
+        theGrid[col][row] = new Cell(centerX, centerY, cellTextSize);
       }
     }
 
@@ -168,15 +175,17 @@ class TheGrid {
 
   public void incCellTextSize() {
     if (cellTextSize < CELL_TEXT_SIZE_MAX) {
-      cellTextSize++;
+      cellTextSize += 2;
       setCellTextSize();
+      println("Text size = " + cellTextSize);
     }
   }
 
   public void decCellTextSize() {
     if (cellTextSize > CELL_TEXT_SIZE_MIN) {
-      cellTextSize--;
+      cellTextSize -= 2;
       setCellTextSize();
+      println("Text size = " + cellTextSize);
     }
   }
 
@@ -186,10 +195,6 @@ class TheGrid {
         theGrid[col][row].setTextSize(cellTextSize);
       }
     }
-  }
-
-  public void moveActiveCell(CellDirection cellDir) {
-
   }
 
   public void update() {
@@ -209,19 +214,94 @@ class TheGrid {
 
   }
 
-  public void setActiveCell(int x, int y) {
-    theGrid[int(activeCell.x)][int(activeCell.y)].setActive(false);
-
-    activeCell.x = x / cellSize.x;
-    activeCell.y = y / cellSize.y;
-
-    theGrid[int(activeCell.x)][int(activeCell.y)].setActive(true);
+  private void setCellValue(int value) {
+    if ((value >= CELL_VALUE_MIN) && (value <= CELL_VALUE_MAX)) {
+      theGrid[activeCell.row][activeCell.col].setValue(value);
+    }
   }
 
   private void setCellValue(int col, int row, int value) {
     if ((value >= CELL_VALUE_MIN) && (value <= CELL_VALUE_MAX)) {
       theGrid[col][row].setValue(value);
     }
+  }
+
+  public void setActiveCell(int row, int col) {
+    theGrid[activeCell.row][activeCell.col].setActive(false);
+
+    activeCell.row = int(row / cellSize.x);
+    activeCell.col = int(col / cellSize.y);
+
+    theGrid[activeCell.row][activeCell.col].setActive(true);
+  }
+
+  public void setActiveCell(CellDirection cellDir) {
+
+    // Make the current active cell not active
+    theGrid[activeCell.row][activeCell.col].setActive(false);
+
+    // Find the new active cell and set it active
+    switch (cellDir) {
+      case UP:
+        if (activeCell.col > 0) {
+          activeCell.col--;
+        } else {
+          // In top row
+          if (activeCell.row > 0) {
+            activeCell.row--;
+            activeCell.col = NUM_CELLS_MAJOR - 1;
+          } else {
+            // In top left cell
+
+          }
+        }
+        break;
+      case DOWN:
+        if (activeCell.col < NUM_CELLS_MAJOR - 1) {
+          activeCell.col++;
+        } else {
+          // In bottom row
+          if (activeCell.row < NUM_CELLS_MAJOR - 1) {
+            activeCell.row++;
+            activeCell.col = 0;
+          } else {
+            // In bottom right cell
+
+          }
+        }
+        break;
+      case LEFT:
+        if (activeCell.row > 0) {
+          activeCell.row--;
+        } else {
+          // In left column
+          if (activeCell.col > 0) {
+            activeCell.col--;
+            activeCell.row = NUM_CELLS_MAJOR - 1;
+          } else {
+            // In top left cell
+
+          }
+        }
+        break;
+      case RIGHT:
+        if (activeCell.row < NUM_CELLS_MAJOR - 1) {
+          activeCell.row++;
+        } else {
+          // In right column
+          if (activeCell.col < NUM_CELLS_MAJOR - 1) {
+            activeCell.col++;
+            activeCell.row = 0;
+          } else {
+            // In bottom right cell
+
+          }
+        }
+        break;
+    }
+
+    // println("Setting cell active: " + activeCell.row + ", " + activeCell.col);
+    theGrid[activeCell.row][activeCell.col].setActive(true);
   }
 
   void removeRowValuesFromPossibleValues(int row, int col) {
@@ -236,7 +316,8 @@ class TheGrid {
   void drawGrid() {
     float cellWidth = width / 9.0;
 
-    background(float(Colors.HUE_MAX));
+    background(Colors.WHITE_GREY_SCL);  //
+    stroke(Colors.BLACK_GREY_SCL);
 
     for (int i = 1; i < NUM_CELLS_MAJOR; i++) {
       if (i % 3 == 0) {
@@ -251,5 +332,14 @@ class TheGrid {
 
   }
 
+  class GridCoords {
+    int row;
+    int col;
+
+    GridCoords(int r, int c) {
+      row = r;
+      col = c;
+    }
+  }
 
 }
