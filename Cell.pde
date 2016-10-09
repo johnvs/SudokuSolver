@@ -48,10 +48,10 @@ class Cell {
 
   public void display() {
 
-    stroke(color(theHue, Colors.SAT_MAX, Colors.BRIGHT_MAX));
+    // stroke(color(theHue, Colors.SAT_MAX, Colors.BRIGHT_MAX));
 
     if (isActive) {
-      stroke(0);
+      stroke(Colors.BLACK_GREY_SCL);
       noFill();
       ellipse(center.x, center.y, width / 9, width / 9);
       // println("Center = " + center.x + ", " + center.y);
@@ -59,7 +59,6 @@ class Cell {
 
     if (theValue > 0) {
       fill(color(theHue, Colors.SAT_MAX, Colors.BRIGHT_MAX));
-      // stroke(color(theHue, Colors.SAT_MAX, Colors.BRIGHT_MAX));
       // println("displaying cell value " + theValue + " at x, y: " + center.x + ", " + center.y);
       String numString = str(theValue);
       textSize(textSize);
