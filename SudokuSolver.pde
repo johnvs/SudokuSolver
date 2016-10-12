@@ -5,9 +5,10 @@
       During this process, if any cell ends up with only one possible value,
       make that the cell's value
 
-  2. For every minor grid, scan every cell's PossibleValues set to look for any cells
-      that have the only occurance of a value in that minor grid. (whose PossibleValues
-      set doesn't necessarily have only that value.)
+  2. For every cell, look at its column, row and minor grid, scan every cell's
+      PossibleValues set to look for any cells that have the only occurance of a
+      value in that minor grid. (whose PossibleValues set doesn't necessarily have
+      only that value.)
 
       For example, minor grid 8, cell 1, it's first pass PossibleValues set is:
         2,3,6,7,9
@@ -49,7 +50,6 @@
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.event.KeyEvent;
@@ -148,10 +148,20 @@ void keyPressed() {
 
     }
     switch (key) {
-      case 's':
+      case 'r':
+      case 'R':
         if (modifierKeys.get("Command")) {
           // println("CMD+s was pressed.");
         } else {
+          theGrid.reset();
+        }
+        break;
+      case 's':
+      case 'S':
+        if (modifierKeys.get("Command")) {
+          // println("CMD+s was pressed.");
+        } else {
+          theGrid.solve();
         }
         break;
       case 'd':
