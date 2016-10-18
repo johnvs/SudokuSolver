@@ -119,10 +119,12 @@ class TheGrid {
     }
   }
 
-  private void lookForSingleOccurancePosValCols() {
+  private int lookForSingleOccurancePosValCols() {
     // For every column, scan every cell's PossibleValues set to look for any
     // cells that have the only occurance of a value in that column, whose
     // PossibleValues set doesn't necessarily have only that value.
+
+    int numCellsSet = 0;
 
     println("**** Checking columns ****");
 
@@ -161,6 +163,7 @@ class TheGrid {
         if (entry.getValue().size() == 1) {
           for (Integer value : entry.getValue()) {
             setCellValue(col, value, entry.getKey());
+            numCellsSet++;
             println("Row " + value + " has the only " + entry.getKey() + " in column " + col);
           }
         }
@@ -168,12 +171,15 @@ class TheGrid {
 
     }
 
+    return numCellsSet;
   }
 
-  private void lookForSingleOccurancePosValRows() {
+  private int lookForSingleOccurancePosValRows() {
     // For every row, scan every cell's PossibleValues set to look for any
     // cells that have the only occurance of a value in that row, whose
     // PossibleValues set doesn't necessarily have only that value.
+
+    int numCellsSet = 0;
 
     println("**** Checking rows ****");
 
@@ -212,6 +218,7 @@ class TheGrid {
         if (entry.getValue().size() == 1) {
           for (Integer value : entry.getValue()) {
             setCellValue(value, row, entry.getKey());
+            numCellsSet++;
             println("Column " + value + " has the only " + entry.getKey() + " in row " + row);
           }
         }
@@ -219,12 +226,15 @@ class TheGrid {
 
     }
 
+    return numCellsSet;
   }
 
-  private void lookForSingleOccurancePosValMinorGrids() {
+  private int lookForSingleOccurancePosValMinorGrids() {
     // For every minor grid, scan every cell's PossibleValues set to look for any
     // cells that have the only occurance of a value in that minor grid, whose
     // PossibleValues set doesn't necessarily have only that value.
+
+    int numCellsSet = 0;
 
     println("**** Checking minor grids ****");
 
@@ -278,6 +288,7 @@ class TheGrid {
               int row = (majorRow * NUM_CELLS_MINOR) + minorRow;
 
               setCellValue(col, row, entry.getKey());
+              numCellsSet++;
               println("Minor Grid column, row " + majorCol + ", " + majorRow + " has the only " +
                   entry.getKey() + " in cellNum " + value);
             }
@@ -286,11 +297,14 @@ class TheGrid {
 
       }
     }
+    return numCellsSet;
   }
 
-  private void lookForSingleOccurancePosValMajor() {
+  private int lookForSingleOccurancePosValMajor() {
     // For every column and row, scan every cell's PossibleValues set to look for any
     // cells that have only one PossibleValues.
+
+    int numCellsSet = 0;
 
     println("**** Checking Major Grid ****");
 
@@ -302,6 +316,7 @@ class TheGrid {
           if (theGrid[col][row].possibleValues.size() == 1) {
             for (Integer value : theGrid[col][row].possibleValues) {
               setCellValue(col, row, value);
+              numCellsSet++;
               println("    Column, row " + col + ", " + row + " has only " + value + " as a possible value");
             }
           }
@@ -309,19 +324,33 @@ class TheGrid {
       }
     }
 
+    return numCellsSet;
   }
 
   public void solve() {
     int passes = 0;
+    int numCellsSet = 0;
+    int numLoopsNoCellsSet = 0;
+
     // Do until all cells are filled
-    while (areAnyZeroValues()) {
-      lookForSingleOccurancePosValCols();
-      lookForSingleOccurancePosValRows();
-      lookForSingleOccurancePosValMinorGrids();
-      lookForSingleOccurancePosValMajor();
+    while (areAnyZeroValues() && (numLoopsNoCellsSet < 2)) {
+      numCellsSet += lookForSingleOccurancePosValCols();
+      numCellsSet += lookForSingleOccurancePosValRows();
+      numCellsSet += lookForSingleOccurancePosValMinorGrids();
+      numCellsSet += lookForSingleOccurancePosValMajor();
       passes++;
+
+      if (numCellsSet == 0) {
+        numLoopsNoCellsSet++;
+      }
+
     }
-    println("All done in " + passes + " passes!");
+
+    if (areAnyZeroValues()) {
+      println("No solution in " + passes + " passes!");
+    } else {
+      println("All done in " + passes + " passes!");
+    }
   }
 
   private boolean areAnyZeroValues() {
