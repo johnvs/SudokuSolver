@@ -30,7 +30,10 @@ class TheGrid {
 
   public TheGrid() {
 
-    theGrid    = new Cell[NUM_CELLS_MAJOR][NUM_CELLS_MAJOR];  // The main array - the objects are actually stored here
+    // The main array - the objects are actually stored here
+    theGrid    = new Cell[NUM_CELLS_MAJOR][NUM_CELLS_MAJOR];
+    // A array that represents the minor grids (3 x 3 cells each),
+    //   and that points to the main array
     minorGrids = new Cell[NUM_CELLS_MINOR][NUM_CELLS_MINOR][NUM_CELLS_MINOR][NUM_CELLS_MINOR];
 
     cellSize = new PVector(width / NUM_CELLS_MAJOR, height / NUM_CELLS_MAJOR);
@@ -340,12 +343,18 @@ class TheGrid {
       numCellsSet += lookForSingleOccurancePosValMajor();
       passes++;
 
+      println("numCellsSet = " + numCellsSet + ", numLoopsNoCellsSet = " + numLoopsNoCellsSet);
       if (numCellsSet == 0) {
         numLoopsNoCellsSet++;
+      } else {
+        numCellsSet = 0;
       }
-
     }
 
+    // println("numCellsSet = " + numCellsSet + ", numLoopsNoCellsSet = " + numLoopsNoCellsSet);
+
+    // numCellsSet = 0;
+    // numLoopsNoCellsSet = 0;
     if (areAnyZeroValues()) {
       println("No solution in " + passes + " passes!");
     } else {
