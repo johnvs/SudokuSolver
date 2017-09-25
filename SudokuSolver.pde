@@ -1,48 +1,70 @@
 
 /*
   pseudo code for solving algorithm
-  1. For every cell, generate it's PossibleValues set
-      During this process, if any cell ends up with only one possible value,
-      make that the cell's value
+  Phase 1
+    1. For every cell, generate it's PossibleValues set
+        During this process, if any cell ends up with only one possible value,
+        make that the cell's value
 
-  2. For every cell, look at its column, row and minor grid, scan every cell's
-      PossibleValues set to look for any cells that have the only occurance of a
-      value in that minor grid. (whose PossibleValues set doesn't necessarily have
-      only that value.)
+    2. For every cell, look at its column, row and minor grid, scan every cell's
+        PossibleValues set to look for any cells that have the only occurance of a
+        value in that minor grid. (whose PossibleValues set doesn't necessarily have
+        only that value.)
+  
+        For example, minor grid 8, cell 1, it's first pass PossibleValues set is:
+          2,3,6,7,9
+  
+        though it is the only cell in that minor grid with a possible value of 7
+  
+        For example,
+        Minor grid x, y
+          Cell number  Possible values
+          0            *2 (* = value is already assigned to that cell, theValue > 0)
+          1            3,6,8,9
+          2            *5
+          3            3,4
+          4            3,4,9
+          5            1,3,4,9
+          6            4,6
+          7            4,6,8,9
+          8            *7
 
-      For example, minor grid 8, cell 1, it's first pass PossibleValues set is:
-        2,3,6,7,9
+          Possible values  Cells with that value
+          1                5
+          2                -1 (meaning that the value is already assigned to a cell)
+          3                1,3,4,5
+          4                3,4,5,6,7
+          5                -1
+          6                1,6,7
+          7                -1
+          8                1,7
+          9                1,4,5,7
+  
+            Note: -1 = the value has been assigned, so theValue > 0, and there are no
+  
+    3. For every minor grid column and row, for every cell with a non-0 value, look for
+        that value in the other minor grids in that column or row.
+  
+  Phase 2
+    If Phase 1 did not completely solve the puzzle, move to phase 2. This starts 
+    with a copy of the current state of the puzzle.
+    
+    1. For every cell whose value is 0, iterate over that cell's possible values (PV). 
+    
+    2. For each value, test it for obvious errors, like illegal possible value sets 
+       within a row, column or grid. If it passes that, set the cell to that value and 
+       move to the next cell. 
+       
+       Possible illegal states:
+       1. Any cell with no PVs.
+       2. A row, column or grid has two cells with only one PV, and they are the same value.
+       3. A row, column or grid has three or more cells with a value of 0 (NUM_VALS_0), and it 
+          has (NUM_VALS_0 - 1) cells with one PV, and the cell with multiple PVs has only all the 
+          PVs of the other cells (i.e. 5 ; 9 ; 5, 9).
+       4. 
+       
+    3. 
 
-      though it is the only cell in that minor grid with a possible value of 7
-
-      For example,
-      Minor grid x, y
-        Cell number  Possible values
-        0            *2 (* = value is already assigned to that cell, theValue > 0)
-        1            3,6,8,9
-        2            *5
-        3            3,4
-        4            3,4,9
-        5            1,3,4,9
-        6            4,6
-        7            4,6,8,9
-        8            *7
-
-        Possible values  Cells with that value
-        1                5
-        2                -1 (meaning that the value is already assigned to a cell)
-        3                1,3,4,5
-        4                3,4,5,6,7
-        5                -1
-        6                1,6,7
-        7                -1
-        8                1,7
-        9                1,4,5,7
-
-          Note: -1 = the value has been assigned, so theValue > 0, and there are no
-
-  3. For every minor grid column and row, for every cell with a non-0 value, look for
-      that value in the other minor grids in that column or row.
 
 */
 
